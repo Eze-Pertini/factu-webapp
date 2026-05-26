@@ -151,7 +151,6 @@ function getSesionUsuario(): array {
     } catch (PDOException $e) {
         // DEBUG TEMPORAL — borrá esto después
         error_log("getSesionUsuario ERROR: " . $e->getMessage());
-        file_put_contents('C:/xampp/htdocs/mini-facturante/debug.txt', $e->getMessage());
         
         return [
             'id'         => $_SESSION['usuario_id']     ?? null,

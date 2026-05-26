@@ -1,0 +1,27 @@
+# Configuración sensible
+includes/db.php
+config.php
+
+# Variables de entorno
+.env
+
+# Logs
+*.log
+
+# Temporales
+*.tmp
+
+# Dependencias
+vendor/
+node_modules/
+
+# VSCode
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+test_mp.php
+test_sesion.php
+debug.txt

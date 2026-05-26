@@ -12,10 +12,10 @@
 // En producción (dominio propio): '' (cadena vacía)
 define('BASE_URL',  '/mini-facturante');
 
-define('DB_HOST',   'localhost');
-define('DB_NAME',   'mini_facturante');
-define('DB_USER',   'root');
-define('DB_PASS',   '');          // En local suele estar vacía
+define('DB_HOST',   'your_host');
+define('DB_NAME',   'your_database');
+define('DB_USER',   'your_user');
+define('DB_PASS',   'your_password');       // En local suele estar vacía
 define('DB_CHARSET','utf8mb4');
 
 // ── CONEXIÓN CON PDO ───────────────────────────
@@ -46,7 +46,7 @@ function getDB(): PDO {
             die(json_encode([
                 'ok'      => false,
                 'mensaje' => 'Error de conexión a la base de datos.',
-                'detalle' => $e->getMessage() // ← quitá esta línea en producción
+                'detalle' => $e->getMessage() // // SOLO desarrollo local - quitar en produccion
             ]));
         }
     }
