@@ -25,3 +25,5 @@ Thumbs.db
 test_mp.php
 test_sesion.php
 debug.txt
+vendor/
+certs/

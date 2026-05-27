@@ -1,0 +1,10 @@
+{
+    "name": "factu/app",
+    "description": "Factu - Facturacion Electronica",
+    "authors": [
+        {
+            "name": "epert",
+            "email": "ee.pertini00@gmail.com"
+        }
+    ]
+}
