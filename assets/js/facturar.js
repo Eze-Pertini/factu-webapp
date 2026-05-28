@@ -192,8 +192,12 @@ function configurarBotonGenerar() {
 
       if (data.ok) {
         sessionStorage.removeItem('pagosSeleccionados');
-        const nums = data.facturas.map(f => f.numero).join(', ');
-        showToast(`✓ ${data.facturas.length} comprobante(s): ${nums}`, 'success', 7000);
+        const conCae = data.con_cae ?? data.facturas.length;
+        const total  = data.facturas.length;
+        const msg    = conCae === total
+          ? `✓ ${total} comprobante(s) con CAE emitido en ARCA`
+          : `✓ ${conCae}/${total} con CAE. Revisá el historial para ver los errores.`;
+        showToast(msg, conCae > 0 ? 'success' : 'warning', 7000);
         setTimeout(() => window.location.href = 'historial.php', 2500);
       } else {
         showToast(data.mensaje, 'error');
@@ -308,9 +312,11 @@ function configurarFacturaManual() {
       const data = await res.json();
 
       if (data.ok) {
-        const nums = data.facturas.map(f => f.numero).join(', ');
-        showToast(`✓ Comprobante generado: ${nums}`, 'success', 6000);
-        // Limpiar formulario
+        const conCae = data.con_cae ?? data.facturas.length;
+        const msg    = conCae > 0
+          ? `✓ Comprobante generado con CAE en ARCA`
+          : `✓ Comprobante generado (sin CAE — verificar en historial)`;
+        showToast(msg, conCae > 0 ? 'success' : 'warning', 6000);
         limpiarFormularioManual();
         setTimeout(() => window.location.href = 'historial.php', 2500);
       } else {

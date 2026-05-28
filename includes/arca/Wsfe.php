@@ -82,20 +82,21 @@ class Wsfe {
                 ],
                 'FeDetReq' => [
                     'FECAEDetRequest' => [
-                        'Concepto'    => $datos['concepto'],
-                        'DocTipo'     => $datos['doc_tipo']    ?? 99,
-                        'DocNro'      => $datos['doc_nro']     ?? 0,
-                        'CbteDesde'   => $datos['cbte_numero'],
-                        'CbteHasta'   => $datos['cbte_numero'],
-                        'CbteFch'     => $datos['fecha_cbte'],
-                        'ImpTotal'    => $datos['importe_total'],
-                        'ImpTotConc'  => 0,
-                        'ImpNeto'     => $datos['importe_total'],
-                        'ImpOpEx'     => 0,
-                        'ImpIVA'      => 0,
-                        'ImpTrib'     => 0,
-                        'MonId'       => 'PES',
-                        'MonCotiz'    => 1,
+                        'Concepto'               => $datos['concepto'],
+                        'DocTipo'                => $datos['doc_tipo']         ?? 99,
+                        'DocNro'                 => $datos['doc_nro']          ?? 0,
+                        'CbteDesde'              => $datos['cbte_numero'],
+                        'CbteHasta'              => $datos['cbte_numero'],
+                        'CbteFch'                => $datos['fecha_cbte'],
+                        'ImpTotal'               => $datos['importe_total'],
+                        'ImpTotConc'             => 0,
+                        'ImpNeto'                => $datos['importe_total'],
+                        'ImpOpEx'                => 0,
+                        'ImpIVA'                 => 0,
+                        'ImpTrib'                => 0,
+                        'MonId'                  => 'PES',
+                        'MonCotiz'               => 1,
+                        'CondicionIVAReceptorId' => $datos['condicion_iva_recp'] ?? 5, // 5 = Consumidor Final (RG 5616)
                     ]
                 ]
             ]

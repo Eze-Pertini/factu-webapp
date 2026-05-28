@@ -1614,3 +1614,48 @@ p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── CAE — Historial de facturas ── */
+
+.cae-cell {
+  min-width: 155px;
+}
+
+.cae-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cae-numero {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: help;
+  letter-spacing: 0.3px;
+}
+
+.cae-vencimiento {
+  font-size: 0.71rem;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  width: fit-content;
+}
+
+.cae-vigente {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.cae-vencido {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.cae-sin-datos {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}

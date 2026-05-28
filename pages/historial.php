@@ -117,6 +117,7 @@ $usuario = getSesionUsuario();
                   <th>Número</th>
                   <th style="text-align:right">Monto</th>
                   <th>Estado</th>
+                  <th>CAE</th>
                   <th>Acciones</th>
                 </tr>
               </thead>

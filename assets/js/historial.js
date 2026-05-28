@@ -13,6 +13,15 @@ const fmtH = {
     const parte = str.includes('T') ? str.split('T')[0] : str.split(' ')[0];
     const [y, m, d] = parte.split('-');
     return `${d}/${m}/${y}`;
+  },
+  // Formatea la fecha de vencimiento del CAE.
+  // ARCA la devuelve como YYYYMMDD; en DB puede quedar como YYYY-MM-DD.
+  fechaCAE: (str) => {
+    if (!str) return '—';
+    if (/^\d{8}$/.test(str)) {
+      return `${str.slice(6, 8)}/${str.slice(4, 6)}/${str.slice(0, 4)}`;
+    }
+    return fmtH.fecha(str);
   }
 };
 
@@ -36,7 +45,7 @@ async function cargarFacturas() {
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted)">
+        <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted)">
           <span class="spinner"></span> Cargando facturas...
         </td>
       </tr>`;
@@ -68,7 +77,7 @@ async function cargarFacturas() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <div class="empty-state">
               <i class="fas fa-exclamation-circle" style="color:var(--status-error)"></i>
               <p>No se pudo cargar el historial.</p>
@@ -106,7 +115,7 @@ function renderizarTabla(facturas) {
   if (facturas.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="empty-state">
             <i class="fas fa-file-invoice"></i>
             <p>No hay facturas generadas aún.<br>
@@ -120,37 +129,66 @@ function renderizarTabla(facturas) {
     return;
   }
 
-  tbody.innerHTML = facturas.map((f, i) => `
-    <tr>
-      <td>${fmtH.fecha(f.fecha_emision)}</td>
-      <td>
-        <div style="font-size:0.85rem; font-weight:500">${htmlEscapeH(f.producto)}</div>
-        <div style="font-size:0.75rem; color:var(--text-muted)">${f.cantidad_pagos} pago(s)</div>
-      </td>
-      <td>
-        <span class="badge ${f.tipo.includes('crédito') ? 'badge-warning' : 'badge-info'}">
-          ${htmlEscapeH(f.tipo)}
-        </span>
-      </td>
-      <td class="font-mono">${htmlEscapeH(f.numero)}</td>
-      <td class="font-mono" style="text-align:right; font-weight:600">
-        ${fmtH.moneda(f.monto_total)}
-      </td>
-      <td>${badgeEstado(f.estado)}</td>
-      <td>
-        <div style="display:flex; gap:6px">
-          <button class="btn btn-ghost btn-sm"
-            onclick="verFactura(${f.id})" title="Ver detalle">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button class="btn btn-ghost btn-sm"
-            onclick="descargarFactura('${htmlEscapeH(f.numero)}')" title="Descargar PDF">
-            <i class="fas fa-download"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = facturas.map((f) => {
+    const tieneCAE = f.cae && f.cae.length > 0;
+
+    // CAE: mostrar primeros 8 + últimos 4 dígitos con tooltip del número completo
+    let caeHtml;
+    if (tieneCAE) {
+      const caeCorto   = f.cae.substring(0, 8) + '...' + f.cae.substring(f.cae.length - 4);
+      const vencLabel  = fmtH.fechaCAE(f.cae_vencimiento);
+      const vencido    = esCaeVencido(f.cae_vencimiento);
+      const vencClass  = vencido ? 'cae-vencimiento cae-vencido' : 'cae-vencimiento cae-vigente';
+      const vencIcon   = vencido ? '⚠' : '✓';
+      caeHtml = `
+        <div class="cae-container">
+          <span class="cae-numero font-mono" title="${htmlEscapeH(f.cae)}">${htmlEscapeH(caeCorto)}</span>
+          <span class="${vencClass}">${vencIcon} ${htmlEscapeH(vencLabel)}</span>
+        </div>`;
+    } else {
+      caeHtml = `<span class="cae-sin-datos">Sin CAE</span>`;
+    }
+
+    // Botón PDF — habilitado solo si hay CAE
+    const btnPDF = tieneCAE
+      ? `<button class="btn btn-ghost btn-sm btn-pdf"
+             onclick="descargarFactura(${f.id}, this)" title="Descargar PDF">
+           <i class="fas fa-download"></i>
+         </button>`
+      : `<button class="btn btn-ghost btn-sm" disabled title="Sin CAE — PDF no disponible"
+             style="opacity:0.35; cursor:not-allowed">
+           <i class="fas fa-download"></i>
+         </button>`;
+
+    return `
+      <tr data-id="${f.id}">
+        <td>${fmtH.fecha(f.fecha_emision)}</td>
+        <td>
+          <div style="font-size:0.85rem; font-weight:500">${htmlEscapeH(f.producto)}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted)">${f.cantidad_pagos} pago(s)</div>
+        </td>
+        <td>
+          <span class="badge ${f.tipo.includes('crédito') ? 'badge-warning' : 'badge-info'}">
+            ${htmlEscapeH(f.tipo)}
+          </span>
+        </td>
+        <td class="font-mono">${htmlEscapeH(f.numero)}</td>
+        <td class="font-mono" style="text-align:right; font-weight:600">
+          ${fmtH.moneda(f.monto_total)}
+        </td>
+        <td>${badgeEstado(f.estado)}</td>
+        <td class="cae-cell">${caeHtml}</td>
+        <td>
+          <div style="display:flex; gap:6px">
+            <button class="btn btn-ghost btn-sm"
+              onclick="verFactura(${f.id})" title="Ver detalle">
+              <i class="fas fa-eye"></i>
+            </button>
+            ${btnPDF}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
 /* ── BADGE ESTADO ── */
@@ -170,9 +208,42 @@ function verFactura(id) {
   // En el futuro: abrir modal con detalle completo
 }
 
-function descargarFactura(numero) {
-  showToast(`Descargando PDF: ${numero}`, 'success');
-  // En el futuro: llamar a /api/facturas.php?id=X&formato=pdf
+function descargarFactura(id, btn) {
+  const url = `/mini-facturante/api/facturas.php?action=pdf&id=${id}`;
+
+  // Feedback visual mientras el browser procesa la descarga
+  if (btn) {
+    const iconOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.innerHTML = iconOriginal;
+      btn.disabled = false;
+    }, 3000);
+  }
+
+  window.open(url, '_blank');
+}
+
+/* ── HELPER: determina si el CAE ya venció ── */
+function esCaeVencido(fechaCAE) {
+  if (!fechaCAE) return false;
+  let fecha;
+  // Formato YYYYMMDD (como devuelve ARCA originalmente)
+  if (/^\d{8}$/.test(fechaCAE)) {
+    fecha = new Date(
+      parseInt(fechaCAE.slice(0, 4)),
+      parseInt(fechaCAE.slice(4, 6)) - 1,
+      parseInt(fechaCAE.slice(6, 8))
+    );
+  } else {
+    // Formato ISO YYYY-MM-DD (como queda en DB después del UPDATE)
+    const [y, m, d] = fechaCAE.split('T')[0].split('-');
+    fecha = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+  }
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return fecha < hoy;
 }
 
 /* ── HELPER XSS ── */

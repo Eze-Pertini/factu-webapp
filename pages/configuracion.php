@@ -57,13 +57,16 @@ $usuario = getSesionUsuario();
           <!-- Columna principal -->
           <div style="display:flex; flex-direction:column; gap:22px">
 
+            <!-- DATOS FISCALES -->
             <div class="card">
               <div class="card-header">
                 <h3><i class="fas fa-building" style="color:var(--brand-primary);margin-right:8px"></i>Datos fiscales</h3>
-                <span class="badge badge-success">AFIP conectado</span>
+                <span class="badge badge-success" id="afip-badge">AFIP conectado</span>
               </div>
               <div class="card-body">
                 <div style="display:flex;flex-direction:column;gap:18px">
+
+                  <!-- CUIT + Punto de venta -->
                   <div class="form-row">
                     <div class="form-group">
                       <label class="form-label">CUIT <span style="color:var(--status-error)">*</span></label>
@@ -74,74 +77,149 @@ $usuario = getSesionUsuario();
                       <input type="text" class="form-input" id="config-pv" placeholder="0001" maxlength="4">
                     </div>
                   </div>
+
+                  <!-- Razón social -->
                   <div class="form-group">
                     <label class="form-label">Razón social / Nombre y apellido <span style="color:var(--status-error)">*</span></label>
                     <input type="text" class="form-input" id="config-razon" placeholder="Tu nombre completo o razón social">
                   </div>
-                  <div class="form-group">
-                    <label class="form-label">Email de contacto</label>
-                    <input type="email" class="form-input" id="config-email" placeholder="tu@email.com">
+
+                  <!-- Condición + Categoría -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Condición fiscal</label>
+                      <select class="form-select" id="config-condicion">
+                        <option value="Monotributista">Monotributista</option>
+                        <option value="Responsable Inscripto">Responsable Inscripto</option>
+                        <option value="Exento">Exento</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Categoría de monotributo</label>
+                      <select class="form-select" id="config-categoria">
+                        <option value="Categoria A">Categoría A</option>
+                        <option value="Categoria B">Categoría B</option>
+                        <option value="Categoria C">Categoría C</option>
+                        <option value="Categoria D">Categoría D</option>
+                        <option value="Categoria E">Categoría E</option>
+                        <option value="Categoria F">Categoría F</option>
+                        <option value="Categoria G">Categoría G</option>
+                        <option value="Categoria H">Categoría H</option>
+                        <option value="Categoria I">Categoría I</option>
+                        <option value="Categoria J">Categoría J</option>
+                        <option value="Categoria K">Categoría K</option>
+                      </select>
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label">Condición fiscal</label>
-                    <select class="form-select">
-                      <option selected>Monotributista</option>
-                      <option>Responsable Inscripto</option>
-                      <option>Exento</option>
-                    </select>
+
+                  <!-- IIBB + Inicio actividades -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">IIBB (Ingresos Brutos)</label>
+                      <input type="text" class="form-input" id="config-iibb" placeholder="20-00000000-0">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Inicio de actividades</label>
+                      <input type="date" class="form-input" id="config-inicio-act">
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label">Categoría de monotributo</label>
-                    <select class="form-select">
-                      <option>Categoría A</option>
-                      <option>Categoría B</option>
-                      <option>Categoría C</option>
-                      <option selected>Categoría D</option>
-                      <option>Categoría E</option>
-                      <option>Categoría F</option>
-                    </select>
+
+                  <hr style="border:none;border-top:1px solid var(--border-color);margin:4px 0">
+                  <p style="font-size:0.8rem;color:var(--text-muted);margin:0">
+                    <i class="fas fa-map-marker-alt" style="margin-right:4px"></i>Domicilio fiscal
+                  </p>
+
+                  <!-- Domicilio -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Calle y número</label>
+                      <input type="text" class="form-input" id="config-domicilio" placeholder="Av. Corrientes 1234">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Piso / Dpto (opcional)</label>
+                      <input type="text" class="form-input" id="config-piso-dpto" placeholder="Piso 3 Dpto B">
+                    </div>
                   </div>
-                  <div style="display:flex;justify-content:flex-end;gap:10px">
-                    <button class="btn btn-secondary" onclick="showToast('Cambios descartados', 'info')">Cancelar</button>
+
+                  <!-- Ciudad + Provincia + CP -->
+                  <div style="display:grid;grid-template-columns:1fr 1fr 120px;gap:16px">
+                    <div class="form-group">
+                      <label class="form-label">Ciudad</label>
+                      <input type="text" class="form-input" id="config-ciudad" placeholder="Buenos Aires">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Provincia</label>
+                      <input type="text" class="form-input" id="config-provincia" placeholder="CABA">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Cód. Postal</label>
+                      <input type="text" class="form-input" id="config-cp" placeholder="1043" maxlength="8">
+                    </div>
+                  </div>
+
+                  <hr style="border:none;border-top:1px solid var(--border-color);margin:4px 0">
+                  <p style="font-size:0.8rem;color:var(--text-muted);margin:0">
+                    <i class="fas fa-address-book" style="margin-right:4px"></i>Contacto
+                  </p>
+
+                  <!-- Email + Teléfono -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Email de contacto</label>
+                      <input type="email" class="form-input" id="config-email" placeholder="tu@email.com">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Teléfono</label>
+                      <input type="text" class="form-input" id="config-telefono" placeholder="11 1234-5678">
+                    </div>
+                  </div>
+
+                  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+                    <button class="btn btn-secondary" onclick="cargarConfiguracion()">
+                      <i class="fas fa-rotate-left"></i> Descartar cambios
+                    </button>
                     <button class="btn btn-primary" id="btn-guardar-fiscal">
                       <i class="fas fa-save"></i> Guardar cambios
                     </button>
                   </div>
+
                 </div>
               </div>
             </div>
 
+            <!-- MERCADO PAGO -->
             <div class="card">
               <div class="card-header">
                 <h3><i class="fas fa-credit-card" style="color:#009ee3;margin-right:8px"></i>Integración Mercado Pago</h3>
-                <span class="badge badge-warning">Por configurar</span>
+                <span class="badge badge-warning" id="mp-badge">Por configurar</span>
               </div>
               <div class="card-body">
                 <div style="display:flex;flex-direction:column;gap:18px">
                   <div class="form-group">
                     <label class="form-label">Access Token</label>
-                    <input type="password" class="form-input" id="mp-token"
-                      placeholder="APP_USR-xxxx-xxxx-xxxx-xxxx"
-                      value="APP_USR-1234567890-demo-token">
-                    <span class="text-muted" style="font-size:0.78rem;margin-top:4px">
+                    <input type="password" class="form-input" id="mp-token-input"
+                      placeholder="APP_USR-xxxx-xxxx-xxxx-xxxx">
+                    <div id="mp-token-status" style="margin-top:6px"></div>
+                    <span class="text-muted" style="font-size:0.78rem;margin-top:4px;display:block">
                       Obtené tu Access Token desde el panel de
-                      <a href="#" style="color:var(--brand-primary)" onclick="showToast('Abriendo Mercado Pago Developers...', 'info')">
+                      <a href="https://www.mercadopago.com.ar/developers/panel/app"
+                         target="_blank" style="color:var(--brand-primary)">
                         Mercado Pago Developers
                       </a>
                     </span>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Ambiente</label>
-                    <select class="form-select">
-                      <option>Producción</option>
-                      <option selected>Sandbox (pruebas)</option>
+                    <select class="form-select" id="mp-ambiente">
+                      <option value="produccion">Producción</option>
+                      <option value="sandbox">Sandbox (pruebas)</option>
                     </select>
                   </div>
                   <div style="display:flex;gap:10px;flex-wrap:wrap">
-                    <button class="btn btn-secondary" onclick="showToast('Conexión con Mercado Pago exitosa ✓', 'success')">
+                    <button class="btn btn-secondary" id="btn-probar-mp">
                       <i class="fas fa-plug"></i> Probar conexión
                     </button>
-                    <button class="btn btn-primary" onclick="showToast('Token guardado', 'success')">
+                    <button class="btn btn-primary" id="btn-guardar-token">
                       <i class="fas fa-save"></i> Guardar token
                     </button>
                   </div>

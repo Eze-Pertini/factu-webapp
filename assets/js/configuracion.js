@@ -32,31 +32,47 @@ async function cargarConfiguracion() {
   }
 }
 
-/* ── POBLAR FORMULARIO CON DATOS DE LA DB ── */
+/* ── POBLAR FORMULARIO ── */
 function poblarFormulario(config) {
-  // Datos fiscales
-  setVal('config-cuit',  config.cuit);
-  setVal('config-razon', config.razon_social);
-  setVal('config-pv',    config.punto_venta);
-  setVal('config-email', config.email_contacto);
+  // Datos identificatorios
+  setVal('config-cuit',       config.cuit);
+  setVal('config-pv',         config.punto_venta);
+  setVal('config-razon',      config.razon_social);
+  setVal('config-iibb',       config.iibb);
 
-  // Selects
+  // Inicio actividades: la DB guarda YYYY-MM-DD, el input type=date necesita ese formato
+  if (config.inicio_actividades) {
+    const partes = config.inicio_actividades.split('T')[0]; // por si viene con hora
+    setVal('config-inicio-act', partes);
+  }
+
+  // Condición y categoría
   setSelect('config-condicion', config.condicion_fiscal);
   setSelect('config-categoria', config.categoria_mono);
 
-  // Mercado Pago — mostrar estado del token
+  // Domicilio
+  setVal('config-domicilio',  config.domicilio);
+  setVal('config-piso-dpto',  config.piso_dpto);
+  setVal('config-ciudad',     config.ciudad);
+  setVal('config-provincia',  config.provincia);
+  setVal('config-cp',         config.codigo_postal);
+
+  // Contacto
+  setVal('config-email',      config.email_contacto);
+  setVal('config-telefono',   config.telefono);
+
+  // Mercado Pago
   const mpStatus = document.getElementById('mp-token-status');
   if (mpStatus) {
     if (config.mp_token_guardado) {
       mpStatus.innerHTML = `
         <span style="color:var(--status-success);font-size:0.83rem">
-          <i class="fas fa-circle-check"></i> Token guardado
+          <i class="fas fa-circle-check"></i> Token guardado correctamente
         </span>`;
-      // Cambiar badge a conectado
       const badge = document.getElementById('mp-badge');
       if (badge) {
         badge.textContent = 'Conectado';
-        badge.className = 'badge badge-success';
+        badge.className   = 'badge badge-success';
       }
     }
   }
@@ -71,12 +87,20 @@ function configurarFormFiscal() {
   btnGuardar.dataset.cfgListener = 'true';
 
   btnGuardar.addEventListener('click', async () => {
-    const cuit      = document.getElementById('config-cuit')?.value?.trim();
-    const razon     = document.getElementById('config-razon')?.value?.trim();
-    const pv        = document.getElementById('config-pv')?.value?.trim();
-    const email     = document.getElementById('config-email')?.value?.trim();
-    const condicion = document.getElementById('config-condicion')?.value;
-    const categoria = document.getElementById('config-categoria')?.value;
+    const cuit       = document.getElementById('config-cuit')?.value?.trim();
+    const razon      = document.getElementById('config-razon')?.value?.trim();
+    const pv         = document.getElementById('config-pv')?.value?.trim();
+    const email      = document.getElementById('config-email')?.value?.trim();
+    const condicion  = document.getElementById('config-condicion')?.value;
+    const categoria  = document.getElementById('config-categoria')?.value;
+    const iibb       = document.getElementById('config-iibb')?.value?.trim();
+    const inicioAct  = document.getElementById('config-inicio-act')?.value?.trim();
+    const domicilio  = document.getElementById('config-domicilio')?.value?.trim();
+    const pisoDpto   = document.getElementById('config-piso-dpto')?.value?.trim();
+    const ciudad     = document.getElementById('config-ciudad')?.value?.trim();
+    const provincia  = document.getElementById('config-provincia')?.value?.trim();
+    const cp         = document.getElementById('config-cp')?.value?.trim();
+    const telefono   = document.getElementById('config-telefono')?.value?.trim();
 
     if (!cuit || !razon) {
       showToast('CUIT y razón social son obligatorios', 'warning');
@@ -92,13 +116,21 @@ function configurarFormFiscal() {
         headers:     { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify({
-          seccion:          'fiscal',
+          seccion:             'fiscal',
           cuit,
-          razon_social:     razon,
-          punto_venta:      pv || '0001',
-          email_contacto:   email,
-          condicion_fiscal: condicion,
-          categoria_mono:   categoria,
+          razon_social:        razon,
+          punto_venta:         pv || '0001',
+          email_contacto:      email,
+          condicion_fiscal:    condicion,
+          categoria_mono:      categoria,
+          iibb,
+          inicio_actividades:  inicioAct,
+          domicilio,
+          piso_dpto:           pisoDpto,
+          ciudad,
+          provincia,
+          codigo_postal:       cp,
+          telefono,
         })
       });
 
@@ -107,7 +139,6 @@ function configurarFormFiscal() {
 
       showToast('Datos fiscales guardados correctamente', 'success');
 
-      // Actualizar punto de venta si cambió
       if (data.punto_venta) {
         setVal('config-pv', data.punto_venta);
       }
@@ -156,23 +187,21 @@ function configurarFormMercadoPago() {
 
       showToast('Token de Mercado Pago guardado correctamente', 'success');
 
-      // Actualizar badge
       const badge = document.getElementById('mp-badge');
       if (badge) {
         badge.textContent = 'Conectado';
         badge.className   = 'badge badge-success';
       }
 
-      // Limpiar campo del token por seguridad
+      // Limpiar campo por seguridad
       const input = document.getElementById('mp-token-input');
       if (input) input.value = '';
 
-      // Mostrar estado
       const mpStatus = document.getElementById('mp-token-status');
       if (mpStatus) {
         mpStatus.innerHTML = `
           <span style="color:var(--status-success);font-size:0.83rem">
-            <i class="fas fa-circle-check"></i> Token guardado
+            <i class="fas fa-circle-check"></i> Token guardado correctamente
           </span>`;
       }
 
